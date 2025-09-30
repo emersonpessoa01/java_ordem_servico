@@ -117,5 +117,20 @@ public class OrdemServicoUseCaseTest {
         verify(outputPort, times(1)).update(1L,os);
 
     }
+    @Test
+    void naoDeletarOrdemServico() {
+        // Given (Dado): cria OrdemServico e configura mock para retornar essa ordem ao deletar
+        OrdemServico os = new OrdemServico();
+        when(outputPort.delete(os)).thenReturn(os);
+
+        // When (Quando): executa o metodo delete
+        OrdemServico resultado = ordemServicoUseCase.delete(os);
+
+        // Then (Então): verifica se o resultado não é nulo e se o mock foi chamado apenas uma vez
+        assertNotNull(resultado);
+        verify(outputPort, times(1)).delete(os);
+    }
+
+
 
 }
