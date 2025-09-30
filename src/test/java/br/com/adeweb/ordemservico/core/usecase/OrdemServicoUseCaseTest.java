@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,6 +50,28 @@ public class OrdemServicoUseCaseTest {
         assertNotNull(resultado);
         assertEquals(2, resultado.getContent().size());
         verify(outputPort,times(1)).findAll(any(Pageable.class));
+
+    }
+    @Test
+    void deveRetornarOrdemServicoPorIdQuandoExistir(){
+        // Given - Prepara uma ordem de serviço mockada
+        OrdemServico os = new OrdemServico();
+        os.setId(1L);
+
+        // Testa que o metodo findById retorna objeto OrdemServico correto quando existe
+        when(outputPort.findById(1L)).thenReturn(Optional.of(os));
+
+        // When - Executa o metodo que sera testado
+
+        // Verifica se a consulta pelo ID chama o metodo do outputPort exatamente uma vez
+        OrdemServico resultado = ordemServicoUseCase.findById(1L);
+
+        // Then - Verifica se o resultado não é nulo e corresponde a ordem de serviço mockada
+
+        //Garante que o resultado não seja nulo e o ID corresponda ao esperado
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getId());
+        verify(outputPort, times(1)).findById(1L);
 
     }
 }
