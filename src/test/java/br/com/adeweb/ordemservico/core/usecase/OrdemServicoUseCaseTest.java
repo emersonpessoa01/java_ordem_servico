@@ -101,5 +101,21 @@ public class OrdemServicoUseCaseTest {
         assertNotNull(resultado);
         verify(outputPort, times(1)).save(os);
     }
+    @Test
+    void deveAtualizarOrdemServico(){
+        // given (dado): Cria uma ordem de servico e configura o mock para aimular que a ordem existe e para o retorno da atualizacao
+        OrdemServico os = new OrdemServico();
+        when(outputPort.findById(1L)).thenReturn(Optional.of(os));
+        when(outputPort.update(1L,os)).thenReturn(os);
+
+        // When (quando): Executa o metodo update do usecase para atualizar a ordem com ID 1
+        OrdemServico resultado = ordemServicoUseCase.update(1L, os);
+
+        // Then (então): Verifica se o resultado não é nulo e se os metodos findById e update do outputPort foram chamados exatamente uma vez
+        assertNotNull(resultado);
+        verify(outputPort, times(1)).findById(1L);
+        verify(outputPort, times(1)).update(1L,os);
+
+    }
 
 }
