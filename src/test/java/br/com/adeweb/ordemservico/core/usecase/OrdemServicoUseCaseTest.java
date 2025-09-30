@@ -88,5 +88,18 @@ public class OrdemServicoUseCaseTest {
         assertTrue(exception.getMessage().contains("Ordem Serviço Não encontrado"));
         verify(outputPort, times(1)).findById(1L);
     }
+    @Test
+    void deveSalvarOrdemServico() {
+        /// Given (Dado): cria um objeto OrdemServico para ser salvo e configura o mock para retornar esse objeto ao salvar
+        OrdemServico os = new OrdemServico();
+        when(outputPort.save(os)).thenReturn(os);
+
+        // When (Quando): chama o metodo save do use case passando o objeto OrdemServico
+        OrdemServico resultado = ordemServicoUseCase.save(os);
+
+        // Then (Então): verifica se o resultado não é nulo e se o metodo save do outputPort foi chamado exatamente uma vez
+        assertNotNull(resultado);
+        verify(outputPort, times(1)).save(os);
+    }
 
 }
