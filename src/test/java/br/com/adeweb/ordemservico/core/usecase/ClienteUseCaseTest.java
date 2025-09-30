@@ -79,7 +79,7 @@ public class ClienteUseCaseTest {
         verify(outputPort, times(1)).salvar(cliente);
     }
     @Test
-    void dveAtualizarCliente(){
+    void deveAtualizarCliente(){
         // Given - preparação do cenário
         Cliente cliente = new Cliente();
         when(outputPort.buscarPorId(1L)).thenReturn(Optional.of(cliente));

@@ -1,0 +1,54 @@
+package br.com.adeweb.ordemservico.core.usecase;
+
+import br.com.adeweb.ordemservico.core.domain.model.OrdemServico;
+import br.com.adeweb.ordemservico.core.exception.EntidadeNaoEncontradaExecption;
+import br.com.adeweb.ordemservico.port.output.OrdemServicoOutputPort;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
+
+
+@ExtendWith(MockitoExtension.class)
+public class OrdemServicoUseCaseTest {
+    @Mock
+    private OrdemServicoOutputPort outputPort;
+    //Mock de dependências
+
+    @InjectMocks
+    private OrdemServicoUseCase ordemServicoUseCase;
+    //Classe a ser testada
+
+    @Test
+    void deveRetornarListaDeOrdensServico(){
+        // Given - Prepara lista de ordens de serviço mockadas(simuladas)
+        OrdemServico os1  = new OrdemServico();
+        OrdemServico os2  = new OrdemServico();
+        List<OrdemServico> ordens = List.of(os1, os2);
+        Page<OrdemServico> pageOrdens = new PageImpl<>(ordens);
+
+         //Configura mock para retornar a lista simaluda
+        when(outputPort.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(ordens));
+
+        ////When - Executa metdo que sera testado
+        Page<OrdemServico> resultado = ordemServicoUseCase.findAll(Pageable.unpaged());
+
+        //Then - Verifica se o resultado não é nulo e contém a lista mockada
+        assertNotNull(resultado);
+        assertEquals(2, resultado.getContent().size());
+        verify(outputPort,times(1)).findAll(any(Pageable.class));
+
+    }
+}
