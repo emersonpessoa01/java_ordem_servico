@@ -17,8 +17,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -74,4 +73,20 @@ public class OrdemServicoUseCaseTest {
         verify(outputPort, times(1)).findById(1L);
 
     }
+    @Test
+    void deveLancarExcecaoQuandoServicoNaoEncontrado() {
+        // Given (Dado) - Configura o mock para retornar Optional vazio simulando que a ordem não existe
+        when(outputPort.findById(1L)).thenReturn(Optional.empty());
+
+        //When (Quando):Chama o metodo que deve lancar excecao
+        EntidadeNaoEncontradaExecption exception = assertThrows(EntidadeNaoEncontradaExecption.class, () -> {
+            ordemServicoUseCase.findById(1L);
+        });
+
+        //Then (Entao): Verifica se a excecao foi lancada com a mensagem correta
+
+        assertTrue(exception.getMessage().contains("Ordem Serviço Não encontrado"));
+        verify(outputPort, times(1)).findById(1L);
+    }
+
 }
