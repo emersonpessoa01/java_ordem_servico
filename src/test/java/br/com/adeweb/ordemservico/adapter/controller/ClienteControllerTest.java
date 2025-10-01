@@ -2,6 +2,7 @@ package br.com.adeweb.ordemservico.adapter.controller;
 
 import br.com.adeweb.ordemservico.adapter.input.controller.ClienteController;
 import br.com.adeweb.ordemservico.adapter.input.mapper.ClienteMapper;
+import br.com.adeweb.ordemservico.adapter.input.request.ClienteRequest;
 import br.com.adeweb.ordemservico.adapter.input.response.ClienteResponse;
 import br.com.adeweb.ordemservico.core.domain.model.Cliente;
 import br.com.adeweb.ordemservico.core.usecase.ClienteUseCase;
@@ -84,6 +85,31 @@ public class ClienteControllerTest {
         verify(clienteUseCase, times(1)).findById(clienteId);
         verify(clienteMapper, times(1)).toResponse(cliente);
 
+    }
+
+    @Test
+    void deveSalvarCliente(){
+        // Given (Dado): Criação do request, conversão para domínio e cliente salvo com resposta
+        ClienteRequest request =  new ClienteRequest();
+        Cliente cliente = new Cliente();
+        Cliente clienteSalvo = new Cliente();
+        ClienteResponse clienteResponse = new ClienteResponse();
+
+        when(clienteMapper.toDomainFromRequest(request)).thenReturn(cliente);
+        when(clienteUseCase.salvar(cliente)).thenReturn(clienteSalvo);
+        when(clienteMapper.toResponse(clienteSalvo)).thenReturn(clienteResponse);
+
+        // When (Quando): Chama o metodo save do controller
+        ResponseEntity<ClienteResponse> responseEntity = clienteController.save(request);
+
+        // Then (Então): Validar status CREATED e conteudo da resposta
+        assertEquals(201, responseEntity.getStatusCodeValue());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(clienteResponse, responseEntity.getBody());
+
+        verify(clienteMapper, times(1)).toDomainFromRequest(request);
+        verify(clienteUseCase, times(1)).salvar(cliente);
+        verify(clienteMapper, times(1)).toResponse(clienteSalvo);
     }
 
 
