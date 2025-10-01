@@ -111,6 +111,30 @@ public class ClienteControllerTest {
         verify(clienteUseCase, times(1)).salvar(cliente);
         verify(clienteMapper, times(1)).toResponse(clienteSalvo);
     }
+    @Test
+    void deveAtualizarCliente(){
+        // Given (Dado): Configuração da request, dominio,cliente atualizado e resposta convertida
+        Long id = 1L;
+        ClienteRequest request = new ClienteRequest();
+        Cliente cliente = new Cliente();
+        Cliente atualizado = new Cliente();
+        ClienteResponse clienteResponse = new ClienteResponse();
 
+        when(clienteMapper.toDomainFromRequest(request)).thenReturn(cliente);
+        when(clienteUseCase.update(id, cliente)).thenReturn(atualizado);
+        when(clienteMapper.toResponse(atualizado)).thenReturn(clienteResponse);
+
+        // When (Quando): Chama o metodo update do controller
+        ResponseEntity<ClienteResponse> responseEntity = clienteController.update(id, request);
+
+        // Then (Então): Verifica status OK e conteudo da resposta
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(clienteResponse, responseEntity.getBody());
+
+        verify(clienteMapper, times(1)).toDomainFromRequest(request);
+        verify(clienteUseCase, times(1)).update(id, cliente);
+        verify(clienteMapper, times(1)).toResponse(atualizado);
+    }
 
 }
