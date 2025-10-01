@@ -64,5 +64,27 @@ public class ClienteControllerTest {
         verify(clienteMapper, times(1)).toResponse(cliente2);
     }
 
+    @Test
+    void deveRetornarClientePrId(){
+        // Given (dado): Configuração do cliente retornado pelo usecase e a resposta mapeada
+        Long clienteId = 1L;
+        Cliente cliente = new Cliente();
+        ClienteResponse clienteResponse = new ClienteResponse();
+
+        when(clienteUseCase.findById(clienteId)).thenReturn(cliente);
+        when(clienteMapper.toResponse(cliente)).thenReturn(clienteResponse);
+
+        // When (quando): Chama o metodo byId do controller
+        ResponseEntity<ClienteResponse> responseEntity = clienteController.byId(clienteId);
+
+        // Then (então): Verifica status HTTP e contéudo da resposta
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(clienteResponse, responseEntity.getBody());
+        verify(clienteUseCase, times(1)).findById(clienteId);
+        verify(clienteMapper, times(1)).toResponse(cliente);
+
+    }
+
 
 }
