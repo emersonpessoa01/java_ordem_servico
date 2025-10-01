@@ -112,4 +112,32 @@ public class OrdemServicoControllerTest {
         verify(ordemServicoInputPort, times(1)).save(ordemServico);
         verify(ordemServicoMapper, times(1)).toResponse(osSalva);
     }
+
+    @Test
+    void deveAtualizarOrdemServico() {
+        // Given: Prepara request, converte para dominio,atualiza e mapeia resposta
+        Long id = 1L;
+        OrdemServicoRequest request = new OrdemServicoRequest();
+        OrdemServico ordemServico = new OrdemServico();
+        OrdemServico osSalva = new OrdemServico();
+        OrdemServicoResponse response = new OrdemServicoResponse();
+
+        when(ordemServicoMapper.toDaminFromRequest(request)).thenReturn(ordemServico);
+        when(ordemServicoInputPort.update(id, ordemServico)).thenReturn(osSalva);
+        when(ordemServicoMapper.toResponse(osSalva)).thenReturn(response);
+
+        // When: Chama o metodo update do controller
+        ResponseEntity<OrdemServicoResponse> responseEntity = controller.update(id, request);
+
+        // Then: valida status Ok e corpo da resposta
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(response, responseEntity.getBody());
+
+        verify(ordemServicoMapper, times(1)).toDaminFromRequest(request);
+        verify(ordemServicoInputPort, times(1)).update(id, ordemServico);
+        verify(ordemServicoMapper, times(1)).toResponse(osSalva);
+
+
+    }
 }
