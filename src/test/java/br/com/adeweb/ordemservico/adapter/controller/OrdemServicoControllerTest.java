@@ -1,6 +1,7 @@
 package br.com.adeweb.ordemservico.adapter.input.controller;
 
 import br.com.adeweb.ordemservico.adapter.input.mapper.OrdemServicoMapper;
+import br.com.adeweb.ordemservico.adapter.input.request.OrdemServicoRequest;
 import br.com.adeweb.ordemservico.adapter.input.response.OrdemServicoResponse;
 import br.com.adeweb.ordemservico.core.domain.model.OrdemServico;
 import br.com.adeweb.ordemservico.port.input.OrdemServicoInputPort;
@@ -64,6 +65,7 @@ public class OrdemServicoControllerTest {
         verify(ordemServicoMapper, times(1)).toResponse(os1);
         verify(ordemServicoMapper, times(1)).toResponse(os2);
     }
+
     @Test
     void deveRetornarOrdemServicoPorId() {
         // GIVEN: prepara a ordem de serviço retornada e o objeto resposta mapeado
@@ -86,5 +88,28 @@ public class OrdemServicoControllerTest {
         verify(ordemServicoMapper, times(1)).toResponse(os);
     }
 
+    @Test
+    void deveSalvarOrdemServico() {
+        // GIVEN: cria request, converte para domínio, salva e mapeia resposta
+        OrdemServicoRequest request = new OrdemServicoRequest();
+        OrdemServico ordemServico = new OrdemServico();
+        OrdemServico osSalva = new OrdemServico();
+        OrdemServicoResponse response = new OrdemServicoResponse();
 
+        when(ordemServicoMapper.toDaminFromRequest(request)).thenReturn(ordemServico);
+        when(ordemServicoInputPort.save(ordemServico)).thenReturn(osSalva);
+        when(ordemServicoMapper.toResponse(osSalva)).thenReturn(response);
+
+        // WHEN: chama o método save do controller
+        ResponseEntity<OrdemServicoResponse> responseEntity = controller.save(request);
+
+        // THEN: verifica status CREATED e corpo da resposta
+        assertEquals(201, responseEntity.getStatusCodeValue());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(response, responseEntity.getBody());
+
+        verify(ordemServicoMapper, times(1)).toDaminFromRequest(request);
+        verify(ordemServicoInputPort, times(1)).save(ordemServico);
+        verify(ordemServicoMapper, times(1)).toResponse(osSalva);
+    }
 }
