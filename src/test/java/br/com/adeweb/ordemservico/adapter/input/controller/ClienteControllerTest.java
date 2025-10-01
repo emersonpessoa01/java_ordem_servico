@@ -1,4 +1,4 @@
-package br.com.adeweb.ordemservico.adapter.controller;
+package br.com.adeweb.ordemservico.adapter.input.controller;
 
 import br.com.adeweb.ordemservico.adapter.input.controller.ClienteController;
 import br.com.adeweb.ordemservico.adapter.input.mapper.ClienteMapper;
