@@ -2,6 +2,7 @@ package br.com.adeweb.ordemservico.adapter.input.mapper;
 
 
 import br.com.adeweb.ordemservico.adapter.input.request.ClienteRequest;
+import br.com.adeweb.ordemservico.adapter.input.response.ClienteResponse;
 import br.com.adeweb.ordemservico.adapter.output.entities.ClienteEntity;
 import br.com.adeweb.ordemservico.core.domain.model.Cliente;
 import org.junit.jupiter.api.BeforeAll;
@@ -74,6 +75,18 @@ public class ClienteMapperTest {
         // Then: Validar campos
         assertEquals("Lucas", request.getNome());
         assertEquals("lucas@email.com", request.getEmail());
+    }
+    @Test
+    void deveMapearDominioParaResponse(){
+        // Given:Objeto de domínio Cliente
+        Cliente cliente = new Cliente(1L,"Carla","carla@gmail.com");
+
+        // When: Converter para Response
+        ClienteResponse response = clienteMapper.toResponse(cliente);
+
+        // Then: Validar campos
+        assertEquals("Carla", response.getNome());
+        assertEquals("carla@gmail.com", response.getEmail());
     }
 
 }
