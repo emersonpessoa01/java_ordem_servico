@@ -88,5 +88,18 @@ public class ClienteMapperTest {
         assertEquals("Carla", response.getNome());
         assertEquals("carla@gmail.com", response.getEmail());
     }
+    @Test
+    void deveMapearDominioParaEntidade() {
+        // Given: Objeto dominio a ser convertido para entidade
+        Cliente cliente = new Cliente(1L, "Paulo", "paulo@gmail.com");
 
+        // When: Converter para entidade
+        ClienteEntity entity = clienteMapper.toEntity(cliente);
+
+        // Then: validar campos convertidos
+        assertEquals(1L, entity.getId());
+        assertEquals("Paulo", entity.getNome());
+        assertEquals("paulo@gmail.com", entity.getEmail());
+
+    }
 }
