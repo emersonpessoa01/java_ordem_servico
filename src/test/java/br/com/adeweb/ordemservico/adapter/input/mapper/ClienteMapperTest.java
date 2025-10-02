@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ClienteMapperTest {
@@ -44,6 +46,22 @@ public class ClienteMapperTest {
         assertEquals(1L, cliente.getId());
         assertEquals("Maria", cliente.getNome());
         assertEquals("maria@gmail.com", cliente.getEmail());
+    }
+    @Test
+    void deveMapearListaDeEntidadesParaListaDeDominio(){
+        // Given: Lista de entidades para converter
+        List<ClienteEntity> entidades = List.of(
+                new ClienteEntity(1L, "Ana","ana@gmail.com"),
+                new ClienteEntity(2L, "Bruno","bruno@gmail.com")
+        );
+
+        // When: Converter para lista de dominio
+        List<Cliente> clientes = clienteMapper.toDomainList(entidades);
+
+        // Then: validar tamanho e dados mapeados
+        assertEquals(2, clientes.size());
+        assertEquals("Ana", clientes.get(0).getNome());
+        assertEquals("Bruno", clientes.get(1).getNome());
     }
 
 }
