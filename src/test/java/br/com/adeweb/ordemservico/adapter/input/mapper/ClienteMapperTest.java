@@ -63,5 +63,17 @@ public class ClienteMapperTest {
         assertEquals("Ana", clientes.get(0).getNome());
         assertEquals("Bruno", clientes.get(1).getNome());
     }
+    @Test
+    void deveMapearDominioParaRequest() {
+        // Given: Objeto de domínio Cliente
+        Cliente cliente = new Cliente(1L, "Lucas", "lucas@email.com");
+
+        // When: Converter para Request
+        ClienteRequest request = clienteMapper.toRequest(cliente);
+
+        // Then: Validar campos
+        assertEquals("Lucas", request.getNome());
+        assertEquals("lucas@email.com", request.getEmail());
+    }
 
 }
