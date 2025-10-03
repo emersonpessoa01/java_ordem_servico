@@ -229,6 +229,97 @@ class OrdemServicoRepositoryTest {
         verify(ordemServicoMapper).toDomainFromEntity(entityComId);
     }
 
+    @Test
+    void deveAtualizarOrdemServico() {
+        // Given: Objeto domínio para atualização sem ID (novo conteúdo para atualizar)
+        OrdemServico ordemServicoAtualizar = new OrdemServico(
+                null,
+                1L,
+                "Descricao Atualizada",
+                null,
+                new BigDecimal("150"),
+                null,
+                null,
+                null
+        );
 
+        // Entidade correspondente antes do save, sem ID pois é o conteúdo enviado
+        OrdemServicoEntity entitySemId = new OrdemServicoEntity(
+                null,
+                1L,
+                "Descricao Atualizada",
+                null,
+                new BigDecimal("150"),
+                null,
+                null,
+                null
+        );
 
+        // Entidade simulando registro salvo no banco com ID já existente
+        OrdemServicoEntity entityComId = new OrdemServicoEntity(
+                1L,
+                1L,
+                "Descricao Atualizada",
+                null,
+                new BigDecimal("150"),
+                null,
+                null,
+                null
+        );
+
+        // Modelo domínio resultado esperado após a atualização
+        OrdemServico ordemServicoAtualizada = new OrdemServico(
+                1L,
+                1L,
+                "Descricao Atualizada",
+                null,
+                new BigDecimal("150"),
+                null,
+                null,
+                null
+        );
+
+        // Mock do mapper para converter domínio para entidade antes do save
+        when(ordemServicoMapper.toEntity(ordemServicoAtualizar)).thenReturn(entitySemId);
+
+        // Mock do método execute para simular procedure de update que retorna o id gerado (1L)
+        when(jdbcTemplate.execute(
+                (org.springframework.jdbc.core.CallableStatementCreator) any(),
+                any(org.springframework.jdbc.core.CallableStatementCallback.class)
+        )).thenAnswer(invocation -> {
+            // Simula setar o id da entidade após update/procedure
+            entitySemId.setId(1L);
+            return 1L;
+        });
+
+        // Mock da queryForObject usada internamente para buscar a entidade atualizada pelo id
+        when(jdbcTemplate.queryForObject(
+                eq(ConstantUtils.SQL_SELECT_BY_ID_ORDEM_SERVICO),
+                any(OrdemServicoRowMapper.class),
+                eq(1L)
+        )).thenReturn(entityComId);
+
+        // Mock do mapper para converter a entidade buscada para o domínio
+        when(ordemServicoMapper.toDomainFromEntity(entityComId)).thenReturn(ordemServicoAtualizada);
+
+        // When: executa update passando id e objeto domínio com dados para atualizar
+        OrdemServico resultado = ordemServicoRepository.update(1L, ordemServicoAtualizar);
+
+        // Then: valida resultado não nulo e id correto
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getId());
+
+        // Verifica se mocks foram chamados com os parâmetros corretos
+        verify(jdbcTemplate).execute(
+                (org.springframework.jdbc.core.CallableStatementCreator) any(),
+                any(org.springframework.jdbc.core.CallableStatementCallback.class)
+        );
+        verify(jdbcTemplate).queryForObject(
+                eq(ConstantUtils.SQL_SELECT_BY_ID_ORDEM_SERVICO),
+                any(OrdemServicoRowMapper.class),
+                eq(1L)
+        );
+        verify(ordemServicoMapper).toEntity(ordemServicoAtualizar);
+        verify(ordemServicoMapper).toDomainFromEntity(entityComId);
+    }
 }
