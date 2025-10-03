@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.data.domain.Pageable;
 
@@ -19,6 +20,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -93,8 +99,9 @@ class OrdemServicoRepositoryTest {
         verify(ordemServicoMapper).toDomainList(entidades);
 
     }
+
     @Test
-    void deveBuscarOrdemServicoPorId(){
+    void deveBuscarOrdemServicoPorId() {
         // Given
         Long id = 1L;
         OrdemServicoEntity entity = new OrdemServicoEntity(
@@ -106,7 +113,7 @@ class OrdemServicoRepositoryTest {
                 LocalDateTime.now(),
                 null,
                 null
-            );
+        );
         when(jdbcTemplate.queryForObject(ConstantUtils.SQL_SELECT_BY_ID_ORDEM_SERVICO,
                 ordemServicoRowMapper,
                 id)).thenReturn(entity);
@@ -120,7 +127,7 @@ class OrdemServicoRepositoryTest {
                 null,
                 null
         );
-       when(ordemServicoMapper.toDomainFromEntity(entity)).thenReturn(dominio);
+        when(ordemServicoMapper.toDomainFromEntity(entity)).thenReturn(dominio);
 
         // When
         Optional<OrdemServico> resultado = ordemServicoRepository.findById(id);
@@ -129,9 +136,99 @@ class OrdemServicoRepositoryTest {
         assertNotNull(resultado.isPresent());
         assertEquals(id, resultado.get().getId());
         verify(jdbcTemplate).queryForObject(ConstantUtils.SQL_SELECT_BY_ID_ORDEM_SERVICO,
-                ordemServicoRowMapper,id);
+                ordemServicoRowMapper, id);
         verify(ordemServicoMapper).toDomainFromEntity(entity);
 
     }
+
+    @Test
+    void deveSalvarOrdemServico() {
+        // Given (Preparação):
+        // Cria a instância da OrdemServico sem ID (novo objeto a ser salvo)
+        OrdemServico ordemServico = new OrdemServico(
+                null,               // id null pois ainda não tem valor
+                1L,                 // id do cliente relacionado
+                "Descricao",        // descrição do serviço
+                null,               // status ou outros campos opcionais nulos
+                new BigDecimal("100"), // valor do serviço
+                null, null, null    // outros campos opcionais
+        );
+
+        // Cria a entidade correspondente antes do save, sem ID (como vai ser enviada ao banco)
+        OrdemServicoEntity entity = new OrdemServicoEntity(
+                null,
+                1L,
+                "Descricao",
+                null,
+                new BigDecimal("100"),
+                null, null, null
+        );
+
+        // Cria a entidade simulando o registro já salvo, com ID gerado (5L por exemplo)
+        OrdemServicoEntity entityComId = new OrdemServicoEntity(
+                5L,
+                1L,
+                "Descricao",
+                null,
+                new BigDecimal("100"),
+                null, null, null
+        );
+
+        // Cria o modelo de domínio para o registro salvo após converter a entidadeComId
+        OrdemServico ordemServicoComId = new OrdemServico(
+                5L,
+                1L,
+                "Descricao",
+                null,
+                new BigDecimal("100"),
+                null, null, null
+        );
+
+        // Configura o mock do mapper para converter domínio para entidade durante o save
+        when(ordemServicoMapper.toEntity(ordemServico)).thenReturn(entity);
+
+        // Configura o mock para o metodo 'execute' do JdbcTemplate, simulando a procedure:
+        // A procedure deve setar o ID gerado no banco em entity e retornar este ID
+        when(jdbcTemplate.execute(
+                (org.springframework.jdbc.core.CallableStatementCreator) any(),
+                any(org.springframework.jdbc.core.CallableStatementCallback.class)))
+                .thenAnswer(invocation -> {
+                    entity.setId(5L); // seta o id gerado na entidade mockada
+                    return 5L;        // retorna o id gerado simulando comportamento real
+                });
+
+        // Configura o mock para o jdbcTemplate.queryForObject usado internamente no findById:
+        // ele deve retornar a entidade salva com ID (entityComId)
+        when(jdbcTemplate.queryForObject(
+                eq(ConstantUtils.SQL_SELECT_BY_ID_ORDEM_SERVICO),
+                any(OrdemServicoRowMapper.class),
+                eq(5L)
+        )).thenReturn(entityComId);
+
+        // Configura o mock para o mapper que converte a entidade com ID para modelo domínio
+        when(ordemServicoMapper.toDomainFromEntity(entityComId)).thenReturn(ordemServicoComId);
+
+        // When (Ação):
+        // Executa o metodo save da classe testada
+        OrdemServico resultado = ordemServicoRepository.save(ordemServico);
+
+        // Then (Assertivas):
+        // Verifica se resultado não é nulo e possui o ID gerado esperado
+        assertNotNull(resultado);
+        assertEquals(5L, resultado.getId());
+
+        // Verifica se os métodos mockados foram chamados com os parâmetros esperados
+        verify(jdbcTemplate).execute(
+                (org.springframework.jdbc.core.CallableStatementCreator) any(),
+                any(org.springframework.jdbc.core.CallableStatementCallback.class));
+        verify(jdbcTemplate).queryForObject(
+                eq(ConstantUtils.SQL_SELECT_BY_ID_ORDEM_SERVICO),
+                any(OrdemServicoRowMapper.class),
+                eq(5L));
+        verify(ordemServicoMapper).toEntity(ordemServico);
+        verify(ordemServicoMapper).toDomainFromEntity(entityComId);
+    }
+
+
 
 }
