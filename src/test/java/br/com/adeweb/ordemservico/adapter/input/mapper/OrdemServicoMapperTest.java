@@ -76,4 +76,22 @@ public class OrdemServicoMapperTest {
         assertEquals("Serviço", entity.getDescricao());
         assertEquals(new BigDecimal("150.75"), entity.getValor());
     }
+    @Test
+    void devoMapearDominioParaRequest(){
+        // Given: Ordem de erviço criado no dominio
+        OrdemServico ordemServico = new OrdemServico();
+        ordemServico.setClienteId(3L);
+        ordemServico.setDescricao("Pedido");
+        ordemServico.setValor(new BigDecimal("300.00"));
+
+        // When: Converter para Request
+        OrdemServicoRequest request = ordemServicoMapper.toRequest(ordemServico);
+
+        // Then: Validar campos convertidos
+        assertEquals(3L, request.getClienteId());
+        assertEquals("Pedido", request.getDescricao());
+        assertEquals(new BigDecimal("300.00"), request.getValor());
+
+    }
+
 }
