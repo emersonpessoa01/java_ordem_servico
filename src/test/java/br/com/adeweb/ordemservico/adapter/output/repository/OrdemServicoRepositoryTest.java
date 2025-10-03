@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class OrdemServicoRepositoryTest {
+class OrdemServicoRepositoryTest {
 
     @Mock
     private JdbcTemplate jdbcTemplate;
@@ -92,4 +93,45 @@ public class OrdemServicoRepositoryTest {
         verify(ordemServicoMapper).toDomainList(entidades);
 
     }
+    @Test
+    void deveBuscarOrdemServicoPorId(){
+        // Given
+        Long id = 1L;
+        OrdemServicoEntity entity = new OrdemServicoEntity(
+                1L,
+                1L,
+                "Descricao",
+                null,
+                new BigDecimal("100"),
+                LocalDateTime.now(),
+                null,
+                null
+            );
+        when(jdbcTemplate.queryForObject(ConstantUtils.SQL_SELECT_BY_ID_ORDEM_SERVICO,
+                ordemServicoRowMapper,
+                id)).thenReturn(entity);
+        OrdemServico dominio = new OrdemServico(
+                1L,
+                1L,
+                "Descricao",
+                null,
+                new BigDecimal("100"),
+                LocalDateTime.now(),
+                null,
+                null
+        );
+       when(ordemServicoMapper.toDomainFromEntity(entity)).thenReturn(dominio);
+
+        // When
+        Optional<OrdemServico> resultado = ordemServicoRepository.findById(id);
+
+        // Then
+        assertNotNull(resultado.isPresent());
+        assertEquals(id, resultado.get().getId());
+        verify(jdbcTemplate).queryForObject(ConstantUtils.SQL_SELECT_BY_ID_ORDEM_SERVICO,
+                ordemServicoRowMapper,id);
+        verify(ordemServicoMapper).toDomainFromEntity(entity);
+
+    }
+
 }
