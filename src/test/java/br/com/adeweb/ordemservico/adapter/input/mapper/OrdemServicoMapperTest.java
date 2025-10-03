@@ -1,6 +1,7 @@
 package br.com.adeweb.ordemservico.adapter.input.mapper;
 
 import br.com.adeweb.ordemservico.adapter.input.request.OrdemServicoRequest;
+import br.com.adeweb.ordemservico.adapter.input.response.OrdemServicoResponse;
 import br.com.adeweb.ordemservico.adapter.output.entities.OrdemServicoEntity;
 import br.com.adeweb.ordemservico.core.domain.model.OrdemServico;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,8 +39,9 @@ public class OrdemServicoMapperTest {
         assertEquals("Descrição", ordemServico.getDescricao());
         assertEquals(new BigDecimal("100.50"), ordemServico.getValor());
     }
+
     @Test
-    void deveMapearEntidadeParaDominio(){
+    void deveMapearEntidadeParaDominio() {
         // Given: OrdemServicoEntity preenchida
         OrdemServicoEntity entity = new OrdemServicoEntity();
         entity.setId(1L);
@@ -58,8 +60,9 @@ public class OrdemServicoMapperTest {
         assertNotNull(ordemServico.getAbertoEm());
 
     }
+
     @Test
-    void deveMapearDominioParaEntidade(){
+    void deveMapearDominioParaEntidade() {
         // Given: Objeto de dominio criado
         OrdemServico ordemServico = new OrdemServico();
         ordemServico.setId(2L);
@@ -76,8 +79,9 @@ public class OrdemServicoMapperTest {
         assertEquals("Serviço", entity.getDescricao());
         assertEquals(new BigDecimal("150.75"), entity.getValor());
     }
+
     @Test
-    void devoMapearDominioParaRequest(){
+    void devoMapearDominioParaRequest() {
         // Given: Ordem de erviço criado no dominio
         OrdemServico ordemServico = new OrdemServico();
         ordemServico.setClienteId(3L);
@@ -91,6 +95,25 @@ public class OrdemServicoMapperTest {
         assertEquals(3L, request.getClienteId());
         assertEquals("Pedido", request.getDescricao());
         assertEquals(new BigDecimal("300.00"), request.getValor());
+
+    }
+
+    @Test
+    void devoMapearDominioParaResponse() {
+        // Given: Instância do dominio
+        OrdemServico ordemServico = new OrdemServico();
+        ordemServico.setId(4L);
+        ordemServico.setDescricao("Resposta");
+        ordemServico.setValor(new BigDecimal("400.00"));
+
+        // When:Converter para Response
+        OrdemServicoResponse response = ordemServicoMapper.toResponse(ordemServico);
+
+        // Then: Validar dados do
+        assertEquals(4L, response.getId());
+        assertEquals("Resposta", response.getDescricao());
+        assertEquals(new BigDecimal("400.00"), response.getValor());
+
 
     }
 
