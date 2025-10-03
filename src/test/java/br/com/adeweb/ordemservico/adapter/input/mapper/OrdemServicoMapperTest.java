@@ -5,7 +5,6 @@ import br.com.adeweb.ordemservico.adapter.output.entities.OrdemServicoEntity;
 import br.com.adeweb.ordemservico.core.domain.model.OrdemServico;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
@@ -58,5 +57,23 @@ public class OrdemServicoMapperTest {
         assertEquals(new BigDecimal("200.00"), ordemServico.getValor());
         assertNotNull(ordemServico.getAbertoEm());
 
+    }
+    @Test
+    void deveMapearDominioParaEntidade(){
+        // Given: Objeto de dominio criado
+        OrdemServico ordemServico = new OrdemServico();
+        ordemServico.setId(2L);
+        ordemServico.setClienteId(2L);
+        ordemServico.setDescricao("Serviço");
+        ordemServico.setValor(new BigDecimal("150.75"));
+
+        // When: Converter para entidade
+        OrdemServicoEntity entity = ordemServicoMapper.toEntity(ordemServico);
+
+        // Then: Validar campos convertidos
+        assertEquals(2L, entity.getId());
+        assertEquals(2L, entity.getClienteId());
+        assertEquals("Serviço", entity.getDescricao());
+        assertEquals(new BigDecimal("150.75"), entity.getValor());
     }
 }
