@@ -10,6 +10,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -114,7 +115,28 @@ public class OrdemServicoMapperTest {
         assertEquals("Resposta", response.getDescricao());
         assertEquals(new BigDecimal("400.00"), response.getValor());
 
+    }
 
+    @Test
+    void devoMapearListaDeEntidadeParaListaDeDominio() {
+        // Given: Lista de entidades para converter
+        OrdemServicoEntity entity1 = new OrdemServicoEntity();
+        entity1.setId(1L);
+        entity1.setDescricao("Serviço 1");
+
+        OrdemServicoEntity entity2 = new OrdemServicoEntity();
+        entity2.setId(2L);
+        entity2.setDescricao("Serviço 2");
+
+        List<OrdemServicoEntity> entidades = List.of(entity1, entity2);
+
+        // When: Converter para lista de domínio
+        List<OrdemServico> ordens = ordemServicoMapper.toDomainList(entidades);
+
+        // Then: Validar tamanho e dados mapeados
+        assertEquals(2, ordens.size());
+        assertEquals("Serviço 1", ordens.get(0).getDescricao());
+        assertEquals("Serviço 2", ordens.get(1).getDescricao());
     }
 
 }
