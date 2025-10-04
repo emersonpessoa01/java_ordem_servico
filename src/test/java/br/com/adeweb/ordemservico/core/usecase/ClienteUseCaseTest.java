@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ClienteUseCaseTest {
+class ClienteUseCaseTest {
     @Mock
     private ClienteOutputPort outputPort;
     // Mock da dependência ClienteOutputPort

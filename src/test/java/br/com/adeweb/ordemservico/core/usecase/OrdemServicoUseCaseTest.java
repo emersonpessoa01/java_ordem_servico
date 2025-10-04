@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-public class OrdemServicoUseCaseTest {
+class OrdemServicoUseCaseTest {
     @Mock
     private OrdemServicoOutputPort outputPort;
     //Mock de dependências
