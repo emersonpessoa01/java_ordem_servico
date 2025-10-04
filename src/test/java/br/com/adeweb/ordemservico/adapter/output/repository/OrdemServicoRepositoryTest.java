@@ -365,5 +365,80 @@ class OrdemServicoRepositoryTest {
         assertEquals(null, resultado);
     }
 
+    @Test
+    void deveSalvarOrdemServicoComIdExistente() {
+        // Given: OrdemServico já com ID (cenário de update via save)
+        OrdemServico ordemServico = new OrdemServico(
+                10L,   // já tem ID
+                1L,
+                "Descricao existente",
+                null,
+                new BigDecimal("200"),
+                null, null, null
+        );
+
+        OrdemServicoEntity entity = new OrdemServicoEntity(
+                10L,
+                1L,
+                "Descricao existente",
+                null,
+                new BigDecimal("200"),
+                null, null, null
+        );
+
+        OrdemServicoEntity entityComId = new OrdemServicoEntity(
+                10L,
+                1L,
+                "Descricao existente",
+                null,
+                new BigDecimal("200"),
+                null, null, null
+        );
+
+        OrdemServico ordemServicoComId = new OrdemServico(
+                10L,
+                1L,
+                "Descricao existente",
+                null,
+                new BigDecimal("200"),
+                null, null, null
+        );
+
+        when(ordemServicoMapper.toEntity(ordemServico)).thenReturn(entity);
+
+        // Simula o retorno do execute (mantém ID já existente)
+        when(jdbcTemplate.execute(
+                (org.springframework.jdbc.core.CallableStatementCreator) any(),
+                any(org.springframework.jdbc.core.CallableStatementCallback.class)
+        )).thenReturn(10L);
+
+        when(jdbcTemplate.queryForObject(
+                eq(ConstantUtils.SQL_SELECT_BY_ID_ORDEM_SERVICO),
+                any(OrdemServicoRowMapper.class),
+                eq(10L)
+        )).thenReturn(entityComId);
+
+        when(ordemServicoMapper.toDomainFromEntity(entityComId)).thenReturn(ordemServicoComId);
+
+        // When
+        OrdemServico resultado = ordemServicoRepository.save(ordemServico);
+
+        // Then
+        assertNotNull(resultado);
+        assertEquals(10L, resultado.getId());
+        verify(ordemServicoMapper).toEntity(ordemServico);
+        verify(jdbcTemplate).execute(
+                (org.springframework.jdbc.core.CallableStatementCreator) any(),
+                any(org.springframework.jdbc.core.CallableStatementCallback.class)
+        );
+        verify(jdbcTemplate).queryForObject(
+                eq(ConstantUtils.SQL_SELECT_BY_ID_ORDEM_SERVICO),
+                any(OrdemServicoRowMapper.class),
+                eq(10L)
+        );
+        verify(ordemServicoMapper).toDomainFromEntity(entityComId);
+    }
+
+
 
 }
