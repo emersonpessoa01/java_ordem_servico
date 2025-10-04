@@ -4,6 +4,7 @@ import br.com.adeweb.ordemservico.adapter.input.mapper.OrdemServicoMapper;
 import br.com.adeweb.ordemservico.adapter.output.entities.OrdemServicoEntity;
 import br.com.adeweb.ordemservico.adapter.output.repository.rowMapper.OrdemServicoRowMapper;
 import br.com.adeweb.ordemservico.core.domain.model.OrdemServico;
+import br.com.adeweb.ordemservico.core.exception.OrdemServicoException;
 import br.com.adeweb.ordemservico.utils.ConstantUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,12 +23,11 @@ import java.util.List;
 import java.util.Optional;
 
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -322,4 +322,48 @@ class OrdemServicoRepositoryTest {
         verify(ordemServicoMapper).toEntity(ordemServicoAtualizar);
         verify(ordemServicoMapper).toDomainFromEntity(entityComId);
     }
+    @Test
+    void deveLancarExcecaoAoBuscarOrdemServicoPorId() {
+        Long id = 1L;
+        when(jdbcTemplate.queryForObject(
+                ConstantUtils.SQL_SELECT_BY_ID_ORDEM_SERVICO,
+                ordemServicoRowMapper,
+                id
+        )).thenThrow(new org.springframework.dao.DataAccessException("nao existe") {});
+
+        Exception ex = assertThrows(OrdemServicoException.class,
+                () -> ordemServicoRepository.findById(id));
+
+        assertTrue(ex.getMessage().contains("Codigo Não Existe"));
+    }
+    @Test
+    void deveLancarExcecaoAoSalvarOrdemServico() {
+        OrdemServico ordemServico = new OrdemServico(null, 1L, "Descricao", null,
+                new BigDecimal("100"), null, null, null);
+
+        OrdemServicoEntity entity = new OrdemServicoEntity(null, 1L, "Descricao", null,
+                new BigDecimal("100"), null, null, null);
+
+        when(ordemServicoMapper.toEntity(ordemServico)).thenReturn(entity);
+
+        when(jdbcTemplate.execute(any(org.springframework.jdbc.core.CallableStatementCreator.class),
+                any(org.springframework.jdbc.core.CallableStatementCallback.class)))
+                .thenThrow(new org.springframework.dao.DataAccessException("erro procedure") {});
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> ordemServicoRepository.save(ordemServico));
+
+        assertTrue(ex.getMessage().contains("Erro ao Cadastrar Ordem Servico"));
+    }
+    @Test
+    void deveRetornarNullAoDeletarOrdemServico() {
+        OrdemServico ordemServico = new OrdemServico(1L, 1L, "Teste", null,
+                new BigDecimal("100"), null, null, null);
+
+        OrdemServico resultado = ordemServicoRepository.delete(ordemServico);
+
+        assertEquals(null, resultado);
+    }
+
+
 }
