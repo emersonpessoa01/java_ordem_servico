@@ -14,11 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 
 @RestController
 @RequestMapping("cliente")
-public class ClienteController {
+public class ClienteController implements IClienteController {
 
     private final ClienteInputPort clienteInputPort;
     private final ClienteMapper clienteMapper;
@@ -28,39 +27,35 @@ public class ClienteController {
         this.clienteMapper = clienteMapper;
     }
 
-    @GetMapping
-    public ResponseEntity<Page<ClienteResponse>> getAll(
-            @RequestParam(defaultValue = "0") final Integer pageNumber,
-            @RequestParam(defaultValue = "10") final Integer size
-    ){
+    @Override
+    public ResponseEntity<Page<ClienteResponse>> getAll(Integer pageNumber, Integer size) {
         Pageable pageable = PageRequest.of(pageNumber, size);
-        Page<Cliente> clientes = clienteInputPort.findAll(pageable);
-
-        Page<ClienteResponse> clienteResponses = clientes.map(clienteMapper::toResponse);
+        Page<ClienteResponse> clienteResponses =
+                clienteInputPort.findAll(pageable)
+                        .map(clienteMapper::toResponse);
 
         return ResponseEntity.ok(clienteResponses);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ClienteResponse> byId(@PathVariable Long id) {
-       Cliente cliente = clienteInputPort.findById(id);
-       return ResponseEntity.ok(clienteMapper.toResponse(cliente));
+    @Override
+    public ResponseEntity<ClienteResponse> byId(Long id) {
+        Cliente cliente = clienteInputPort.findById(id);
+        return ResponseEntity.ok(clienteMapper.toResponse(cliente));
     }
 
-    @PostMapping
-    public ResponseEntity<ClienteResponse> save(@RequestBody ClienteRequest clienteRequest){
+    @Override
+    public ResponseEntity<ClienteResponse> save(ClienteRequest clienteRequest) {
         Cliente cliente = clienteMapper.toDomainFromRequest(clienteRequest);
         Cliente clienteSalvo = clienteInputPort.salvar(cliente);
         ClienteResponse response = clienteMapper.toResponse(clienteSalvo);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ClienteResponse> update(@PathVariable Long id, @RequestBody ClienteRequest clienteRequest){
+    @Override
+    public ResponseEntity<ClienteResponse> update(Long id, ClienteRequest clienteRequest) {
         Cliente cliente = clienteMapper.toDomainFromRequest(clienteRequest);
-        Cliente atualizado = clienteInputPort.update(id,cliente);
+        Cliente atualizado = clienteInputPort.update(id, cliente);
         ClienteResponse clienteResponse = clienteMapper.toResponse(atualizado);
         return ResponseEntity.ok(clienteResponse);
     }
-
 }
