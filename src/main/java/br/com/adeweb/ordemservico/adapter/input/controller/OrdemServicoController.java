@@ -1,9 +1,7 @@
 package br.com.adeweb.ordemservico.adapter.input.controller;
 
 import br.com.adeweb.ordemservico.adapter.input.mapper.OrdemServicoMapper;
-import br.com.adeweb.ordemservico.adapter.input.request.ClienteRequest;
 import br.com.adeweb.ordemservico.adapter.input.request.OrdemServicoRequest;
-import br.com.adeweb.ordemservico.adapter.input.response.ClienteResponse;
 import br.com.adeweb.ordemservico.adapter.input.response.OrdemServicoResponse;
 import br.com.adeweb.ordemservico.core.domain.model.OrdemServico;
 import br.com.adeweb.ordemservico.port.input.OrdemServicoInputPort;
@@ -14,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 
 @RestController
 @RequestMapping("ordemservico")
