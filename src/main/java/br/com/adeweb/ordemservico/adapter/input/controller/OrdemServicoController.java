@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("ordemservico")
-public class OrdemServicoController {
+public class OrdemServicoController implements IOrdemServicoController {
     private final OrdemServicoInputPort ordemServicoInputPort;
     private final OrdemServicoMapper ordemServicoMapper;
 
@@ -23,15 +23,15 @@ public class OrdemServicoController {
         this.ordemServicoInputPort = ordemServicoInputPort;
         this.ordemServicoMapper = ordemServicoMapper;
     }
-    @GetMapping
+    @Override
     public ResponseEntity<Page<OrdemServicoResponse>> getAll(
-            @RequestParam(defaultValue = "0") final Integer pageNumber,
-            @RequestParam(defaultValue = "10") final Integer size
+            Integer pageNumber,
+            Integer size
     ){
         Pageable pageable = PageRequest.of(pageNumber, size);
-        Page<OrdemServico> ordemServicos = ordemServicoInputPort.findAll(pageable);
-        Page<OrdemServicoResponse> ordemServicoResponses = ordemServicos.map(ordemServicoMapper::toResponse);
-        return ResponseEntity.ok(ordemServicoResponses);
+        Page<OrdemServicoResponse> responses = ordemServicoInputPort.findAll(pageable)
+                .map(ordemServicoMapper::toResponse);
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
