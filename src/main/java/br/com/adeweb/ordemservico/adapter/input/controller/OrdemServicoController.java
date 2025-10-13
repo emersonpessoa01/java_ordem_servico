@@ -47,11 +47,11 @@ public class OrdemServicoController implements IOrdemServicoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<OrdemServicoResponse> update(@PathVariable Long id, @RequestBody OrdemServicoRequest ordemServicoRequest){
+    @Override
+    public ResponseEntity<OrdemServicoResponse> update(Long id, OrdemServicoRequest ordemServicoRequest){
         OrdemServico ordemServico = ordemServicoMapper.toDaminFromRequest(ordemServicoRequest);
-        OrdemServico osSalva = ordemServicoInputPort.update(id,ordemServico);
-        OrdemServicoResponse response = ordemServicoMapper.toResponse(osSalva);
+        OrdemServico osSalvo = ordemServicoInputPort.update(id,ordemServico);
+        OrdemServicoResponse response = ordemServicoMapper.toResponse(osSalvo);
         return ResponseEntity.ok(response);
     }
 
