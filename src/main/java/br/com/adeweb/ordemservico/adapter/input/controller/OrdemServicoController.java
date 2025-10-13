@@ -34,8 +34,8 @@ public class OrdemServicoController implements IOrdemServicoController {
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<OrdemServicoResponse> byId(@PathVariable Long id) {
+    @Override
+    public ResponseEntity<OrdemServicoResponse> byId(Long id) {
         OrdemServico ordemServico = ordemServicoInputPort.findById(id);
         return  ResponseEntity.ok(ordemServicoMapper.toResponse(ordemServico));
     }
